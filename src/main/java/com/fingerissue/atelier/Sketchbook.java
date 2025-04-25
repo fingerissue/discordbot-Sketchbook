@@ -1,59 +1,61 @@
 package com.fingerissue.atelier;
 
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.requests.GatewayIntent;
+import com.fingerissue.atelier.config.ConfigManager;
+import com.fingerissue.atelier.discord.DiscordBot;
+import com.fingerissue.atelier.discord.DiscordBotConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 
 public class Sketchbook {
     private static final Logger logger = LoggerFactory.getLogger(Sketchbook.class);
+    private static DiscordBot discordbot;
 
     public static void main(String[] args) {
+        logger.info("애플리케이션을 시작합니다.");
         discordbotLogin();
     }
 
     public static void discordbotLogin() {
         logger.debug("디스코드 봇 로그인을 시작합니다.");
 
-        Properties properties = new Properties();
-        String token;
+        ConfigManager configManager = new ConfigManager();
+        DiscordBotConfig discordBotConfig = new DiscordBotConfig();
 
-        try {
-            InputStream input = Sketchbook.class.getClassLoader().getResourceAsStream("config.properties");
-            if (input == null) {
-                logger.error("config.properties를 읽을 수 없습니다.");
-                return;
-            }
-
-            properties.load(input);
-
-            token = properties.getProperty("discord.token");
-            if (token == null || token.isEmpty() || token.equals("BOT_TOKEN")) {
-                logger.error("discord.token 값이 config.properties 파일에 존재하지 않거나 제대로 세팅되어 있지 않습니다.");
-                return;
-            }
-
-            JDA api = JDABuilder.createDefault(token)
-                    .enableIntents(
-                            GatewayIntent.MESSAGE_CONTENT
-                    )
-                    .build();
-
-            logger.info("{} 봇이 로그인 되었습니다.", api.getSelfUser().getName());
-
-            final String clientID = "1364870723146874881";
-            final int permissions = 0;
-            logger.info("봇 초대하기: https://discord.com/oauth2/authorize?client_id={}&permissions={}&scope=bot", clientID, permissions);
-
-        } catch (IOException e) {
-            logger.error("config.properties 파일을 읽는 중 오류가 발생했습니다.", e);
-        } catch (Exception e) {
-            logger.error("예외가 발생했습니다.", e);
+        if (!configManager.loadConfig()) {
+            logger.error("설정을 로드하지 못했습니다. 애플리케이션을 종료합니다.");
+            System.exit(1);
         }
+
+        if (!discordBotConfig.loadFromConfig(configManager)) {
+            logger.error("디스코드 봇 설정을 로드하지 못했습니다.");
+            System.exit(1);
+        }
+
+        discordbot = new DiscordBot(discordBotConfig);
+
+        if(!discordbot.login()) {
+            logger.error("디스코드 봇 로그인에 실패했습니다.");
+            System.exit(1);
+        }
+
+        logger.info("디스코드 봇 로그인에 성공했습니다.");
     }
+
+    /**
+     * 애플리케이션 종료 시 실행할 작업을 등록합니다.
+     */
+    private static void registerShutdownHook() {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            logger.info("애플리케이션을 종료합니다...");
+
+            // 디스코드 봇 종료
+            if (discordbot != null) {
+                discordbot.shutdown();
+            }
+
+            logger.info("애플리케이션이 정상적으로 종료되었습니다.");
+        }));
+    }
+
 }
