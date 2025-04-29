@@ -90,12 +90,14 @@ public class DiscordBot {
      */
     public void addComands() {
         jda = getJDA();
-
-        jda.addEventListener(new Ping());
-        jda.updateCommands().addCommands(Commands.slash("ping", "pong")).queue(
-                commands -> logger.debug("ping 명령어가 추가되었습니다."),
-                throwable -> logger.error("ping 명령어를 추가하지 못했습니다. ", throwable)
-        );
+        
+        try {
+            jda.addEventListener(new Ping());
+            jda.updateCommands().addCommands(Commands.slash("ping", "pong")).queue();
+            logger.debug("ping 명령어가 추가되었습니다");
+        } catch (Exception e) {
+            logger.error("ping 명령어를 추가하지 못했습니다. ", e);
+        }
     }
 
     /**
