@@ -37,7 +37,7 @@ public class DiscordBotConfig {
      */
     public String generateInviteUrl(String clientId, String permissions) {
         return String.format(
-                "https://discord.com/oauth2/authorize?client_id=%s&permissions=%s&scope=bot",
+                "https://discord.com/oauth2/authorize?client_id=%s&permissions=%s&scope=bot+applications.commands",
                 clientId, permissions
         );
     }
