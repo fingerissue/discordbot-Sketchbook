@@ -40,8 +40,8 @@ public class DiscordBot {
             jda.awaitReady();
             logger.info("{} 봇이 성공적으로 로그인되었습니다.", jda.getSelfUser().getName());
 
-            String inviteUrl = config.generateInviteUrl();
-            if (!inviteUrl.isEmpty()) {
+            if (checkClientId()) {
+                String inviteUrl = config.generateInviteUrl(config.getClientId(), config.getPermissions());
                 logger.info("봇 초대하기: {}", inviteUrl);
             }
 
@@ -53,6 +53,26 @@ public class DiscordBot {
             logger.error("디스코드 봇 초기화 중 오류가 발생했습니다.", e);
             return false;
         }
+    }
+
+    /**
+     * 디스코드 봇의 초대링크를 만들 지 체크합니다.
+     *
+     * @return clientID 설정 여부
+     */
+    public boolean checkClientId() {
+        String clientId = config.getClientId();
+        if (clientId == null) {
+            return false;
+        }
+        if (clientId.isEmpty()) {
+            return false;
+        }
+        if ("CLIENT_ID".equals(clientId) || " ".equals(clientId)) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

@@ -25,7 +25,7 @@ public class DiscordBotConfig {
             return false;
         }
 
-        clientId = configManager.getProperty("discord.clientID", "NONE");
+        clientId = configManager.getProperty("discord.clientID");
         permissions = configManager.getProperty("discord.permission", "0");
         return true;
     }
@@ -35,12 +35,7 @@ public class DiscordBotConfig {
      *
      * @return 봇 초대 URL
      */
-    public String generateInviteUrl() {
-        if (clientId == null || clientId.isEmpty() || "NONE".equals(clientId)) {
-            logger.warn("클라이언트 ID가 설정되지 않았습니다. 초대 URL을 생성할 수 없습니다.");
-            return "";
-        }
-
+    public String generateInviteUrl(String clientId, String permissions) {
         return String.format(
                 "https://discord.com/oauth2/authorize?client_id=%s&permissions=%s&scope=bot",
                 clientId, permissions
