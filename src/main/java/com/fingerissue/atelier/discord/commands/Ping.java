@@ -14,7 +14,8 @@ public class Ping extends ListenerAdapter {
 
         try {
             if (event.getName().equals("ping")) {
-                event.reply("pong").queue();
+                long gatewayPing = event.getJDA().getGatewayPing();
+                event.reply(String.format("Pong! %dms", gatewayPing)).queue();
 
                 if (logger.isDebugEnabled()) {
                     logger.debug("사용자 {}가 사용한 명령어 /ping 이 정상적으로 작동되었습니다.", user);
