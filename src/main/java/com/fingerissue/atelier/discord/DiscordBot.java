@@ -3,13 +3,10 @@ package com.fingerissue.atelier.discord;
 import com.fingerissue.atelier.discord.commands.Ping;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 public class DiscordBot {
     private static final Logger logger = LoggerFactory.getLogger(DiscordBot.class);
@@ -46,7 +43,7 @@ public class DiscordBot {
             jda.awaitReady();
             logger.info("{} 봇이 성공적으로 로그인되었습니다.", jda.getSelfUser().getName());
 
-            addComands();
+            addCommands();
             jda.awaitReady();
             logger.info("명령어가 성공적으로 추가되었습니다.");
 
@@ -88,7 +85,7 @@ public class DiscordBot {
     /**
      * 디스코드 봇의 명령어를 추가합니다.
      */
-    public void addComands() {
+    public void addCommands() {
         jda = getJDA();
         
         try {
@@ -97,16 +94,6 @@ public class DiscordBot {
             logger.debug("ping 명령어가 추가되었습니다");
         } catch (Exception e) {
             logger.error("ping 명령어를 추가하지 못했습니다. ", e);
-        }
-    }
-
-    /**
-     * 디스코드 봇 연결을 종료합니다.
-     */
-    public void shutdown() {
-        if (jda != null) {
-            jda.shutdown();
-            logger.info("디스코드 봇 연결이 종료되었습니다.");
         }
     }
 
